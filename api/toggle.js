@@ -39,7 +39,8 @@ module.exports = async (req, res) => {
 
   const current = await fetch(`${url}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, { headers });
   if (!current.ok) {
-    return res.status(502).json({ error: `GitHub read failed (${current.status})` });
+    const detail = (await current.json().catch(() => ({}))).message || "";
+    return res.status(502).json({ error: `GitHub read failed (${current.status}) ${detail}`.trim() });
   }
   const file = await current.json();
   const status = JSON.parse(Buffer.from(file.content, "base64").toString("utf8"));
@@ -60,7 +61,8 @@ module.exports = async (req, res) => {
     }),
   });
   if (!update.ok) {
-    return res.status(502).json({ error: `GitHub write failed (${update.status})` });
+    const detail = (await update.json().catch(() => ({}))).message || "";
+    return res.status(502).json({ error: `GitHub write failed (${update.status}) ${detail}`.trim() });
   }
 
   return res.status(200).json({ locked, changed: true });
