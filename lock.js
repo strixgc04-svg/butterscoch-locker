@@ -37,7 +37,7 @@
       var root = host.attachShadow({ mode: "closed" });
       root.innerHTML =
         "<style>" +
-        ":host{all:initial}" +
+        ":host{all:initial}*{box-sizing:border-box}" +
         ".wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;" +
         "padding:24px;background:rgba(10,10,12,.96);backdrop-filter:blur(6px);" +
         "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}" +
