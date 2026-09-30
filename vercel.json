@@ -1,0 +1,16 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
+    },
+    {
+      "source": "/status.json",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
+    },
+    {
+      "source": "/lock.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }]
+    }
+  ]
+}
