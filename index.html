@@ -38,13 +38,7 @@
     .switch input:checked + .track::after { transform: translateX(24px); }
     .switch input:focus-visible + .track { outline: 2px solid #f4f4f5; outline-offset: 2px; }
     .switch input:disabled + .track { opacity: .6; }
-    label.pw { display: block; font-size: 13px; color: #a1a1aa; margin-bottom: 6px; }
-    input[type=password] {
-      width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #3f3f46;
-      background: #0f0f11; color: #f4f4f5; font-size: 16px;
-    }
-    input[type=password]:focus { outline: none; border-color: #a1a1aa; }
-    .msg { min-height: 20px; margin: 16px 0 0; font-size: 14px; color: #a1a1aa; }
+    .msg { min-height: 20px; margin: 0; font-size: 14px; color: #a1a1aa; }
     .msg.err { color: #f87171; }
     .msg.ok { color: #4ade80; }
   </style>
@@ -62,20 +56,14 @@
       </div>
     </div>
 
-    <label class="pw" for="pw">Password</label>
-    <input type="password" id="pw" autocomplete="current-password">
-
     <p class="msg" id="msg" aria-live="polite"></p>
   </main>
 
   <script>
     var toggle = document.getElementById("toggle");
-    var pw = document.getElementById("pw");
     var stateEl = document.getElementById("state");
     var msg = document.getElementById("msg");
     var live = null;
-
-    try { pw.value = sessionStorage.getItem("lockpw") || ""; } catch (e) {}
 
     function say(text, kind) {
       msg.textContent = text;
@@ -109,23 +97,16 @@
 
     toggle.addEventListener("change", function () {
       var target = toggle.checked;
-      if (!pw.value) {
-        toggle.checked = live;
-        say("Enter the password first.", "err");
-        pw.focus();
-        return;
-      }
       toggle.disabled = true;
       say("Saving…");
       fetch("/api/toggle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pw.value, locked: target })
+        body: JSON.stringify({ locked: target })
       })
         .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
         .then(function (res) {
           if (!res.ok) throw new Error(res.data.error || "Request failed");
-          try { sessionStorage.setItem("lockpw", pw.value); } catch (e) {}
           show(target);
           stateEl.querySelector("small").textContent = "Deploying… usually under a minute";
           say("Saved. Waiting for the deploy to go live…");

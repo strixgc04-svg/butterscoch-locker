@@ -1,22 +1,13 @@
 /*
- * POST /api/toggle  { "password": "...", "locked": true | false }
- * Checks the admin password, then commits the new "locked" value to
- * status.json on GitHub. The commit triggers a Vercel redeploy.
+ * POST /api/toggle  { "locked": true | false }
+ * Commits the new "locked" value to status.json on GitHub.
+ * The commit triggers a Vercel redeploy.
  *
  * Env vars (set in Vercel project settings):
- *   ADMIN_PASSWORD  password for the toggle page
  *   GITHUB_TOKEN    fine-grained token with Contents: read & write on this repo
  *   GITHUB_REPO     optional, defaults to strixgc04-svg/butterscoch-locker
  *   GITHUB_BRANCH   optional, defaults to main
  */
-const crypto = require("crypto");
-
-function safeEqual(a, b) {
-  const ha = crypto.createHash("sha256").update(String(a)).digest();
-  const hb = crypto.createHash("sha256").update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-}
-
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -24,23 +15,17 @@ module.exports = async (req, res) => {
   }
 
   const {
-    ADMIN_PASSWORD,
     GITHUB_TOKEN,
     GITHUB_REPO = "strixgc04-svg/butterscoch-locker",
     GITHUB_BRANCH = "main",
   } = process.env;
 
-  if (!ADMIN_PASSWORD || !GITHUB_TOKEN) {
-    return res.status(500).json({ error: "Server not configured: set ADMIN_PASSWORD and GITHUB_TOKEN" });
+  if (!GITHUB_TOKEN) {
+    return res.status(500).json({ error: "Server not configured: set GITHUB_TOKEN" });
   }
 
-  const { password, locked } = req.body || {};
+  const { locked } = req.body || {};
 
-  if (typeof password !== "string" || !safeEqual(password, ADMIN_PASSWORD)) {
-    // Slow down password guessing.
-    await new Promise((r) => setTimeout(r, 1000));
-    return res.status(401).json({ error: "Wrong password" });
-  }
   if (typeof locked !== "boolean") {
     return res.status(400).json({ error: '"locked" must be true or false' });
   }

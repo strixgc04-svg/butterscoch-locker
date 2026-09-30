@@ -7,7 +7,7 @@ A remote ON/OFF lock for a Shopify storefront. When it's on, the store is covere
 
 ## Toggle the lock
 
-Open **https://butterscoch-locker.vercel.app**, enter the password, and flip the switch.
+Open **https://butterscoch-locker.vercel.app** and flip the switch. There is no password: anyone with the link can toggle it, so keep the link private.
 
 The page commits the new value to `status.json` in this repo. Vercel redeploys and the change is live, usually in under a minute. The page shows when it's live.
 
@@ -20,17 +20,16 @@ Fallback: edit `status.json` on GitHub directly (`"locked": true` / `false`) and
 | `status.json` | The lock state. `"locked": true` = ON, `"locked": false` = OFF |
 | `lock.js` | Script the theme loads. Reads `status.json` and shows the overlay if locked |
 | `index.html` | The ON/OFF toggle page |
-| `api/toggle.js` | Checks the password and commits `status.json` to GitHub |
+| `api/toggle.js` | Commits the new `status.json` to GitHub |
 | `vercel.json` | CORS + no-cache headers so a toggle takes effect right away |
 
-## Setup (Vercel environment variables)
+## Setup (Vercel environment variable)
 
 | Name | Value |
 |---|---|
-| `ADMIN_PASSWORD` | Password for the toggle page |
 | `GITHUB_TOKEN` | Fine-grained GitHub token, access to this repo only, permission **Contents: Read and write** |
 
-Create the token at https://github.com/settings/personal-access-tokens/new, then add both in
+Create the token at https://github.com/settings/personal-access-tokens/new, then add it in
 Vercel → butterscoch-locker → Settings → Environment Variables (Production), and redeploy.
 
 ## Add to the Shopify theme
